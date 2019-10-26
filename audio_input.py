@@ -3,7 +3,6 @@ Examples of Python audio manipulation.
 Last revised: 10/25/2019 by Benned H
 """
 
-# pyaudio may work for everything, but it's a lot of code.
 # wavio lets us convert NumPy <--> .wav and back
 
 import sounddevice as sd
@@ -18,16 +17,17 @@ def countdown(n):
 		sleep(1)
 
 def main():
-	fs = 44100  # Sample rate
+	hz = 44100  # Sample rate
 	seconds = 3  # Duration of recording
 
 	countdown(seconds)
-	myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
+	record = sd.drec(int(seconds * hz), samplerate=hz, channels=2)
 	print("Recording for",seconds,"seconds...")
+	countdown(seconds)
 	sd.wait()  # Wait until recording is finished
 	print("here")
 
-	write('output.wav', fs, myrecording)  # Save as WAV file
+	write('output.wav', hz, record)  # Save as WAV file
 	print("output.wav saved.")
 
 if __name__ =="__main__":
