@@ -19,5 +19,5 @@ y = np.sin(10000*two_pi*x) + np.sin(5000*two_pi*x)
 yf = np.fft.fft(y) # Fourier transform y
 xf = range(len(yf))
 
-plt.plot(xf,yf)
+plt.plot(np.fft.fftfreq(len(y)), yf)
 plt.show()
