@@ -11,22 +11,22 @@ from time import sleep
 
 def countdown(n):
 	# Prints a countdown to start recording.
-	print("Countdown...")
 	for i in range(n,0,-1):
 		print(i)
 		sleep(1)
 
 def main():
 	hz = 44100  # Sample rate
-	seconds = 3  # Duration of recording
+	seconds = 1  # Duration of recording
 
-	countdown(seconds)
-	record = sd.drec(int(seconds * hz), samplerate=hz, channels=2)
-	print("Recording for",seconds,"seconds...")
-	countdown(seconds)
+	#print("Recording in...")
+	#countdown(seconds)
+	record = sd.rec(int(seconds * hz), samplerate=hz, channels=2)
+	#print("Recording for",seconds,"seconds...")
+	#countdown(seconds)
+	
 	sd.wait()  # Wait until recording is finished
-	print("here")
-
+	print(type(record))
 	write('output.wav', hz, record)  # Save as WAV file
 	print("output.wav saved.")
 
