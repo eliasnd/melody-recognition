@@ -21,14 +21,15 @@ def main():
 
 	#print("Recording in...")
 	#countdown(seconds)
-	record = sd.rec(int(seconds * hz), samplerate=hz, channels=2)
-	#print("Recording for",seconds,"seconds...")
+	record = sd.rec(int(seconds * hz), samplerate=hz, channels=1)
+	print("Recording for",seconds,"seconds...")
 	#countdown(seconds)
 	
 	sd.wait()  # Wait until recording is finished
-	print(type(record))
-	write('output.wav', hz, record)  # Save as WAV file
-	print("output.wav saved.")
+	print("Type:",type(record),"Shape",record.shape,"Max",max(record))
+
+	#write('output.wav', hz, record)  # Save as WAV file
+	#print("output.wav saved.")
 
 if __name__ =="__main__":
 	main()
