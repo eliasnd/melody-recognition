@@ -10,7 +10,9 @@ from scipy.io.wavfile import read, write
 import aubio
 import audioop
 from time import sleep
-from math import sqrt
+from math import sqrt, floor
+
+samplerate = 44100
 
 def countdown(n,scale=1):
 	# Prints a countdown to start recording.
@@ -18,8 +20,9 @@ def countdown(n,scale=1):
 		print(i)
 		sleep(1/scale)
 
+
 def getPitches(src):
-	samplerate = 44100
+	samplerate = 44100 # unsure why global samplerate not working for this method. Benned please explain
 	win_s = 4096 # fft size
 	hop_s = 512 # hop size -- number of notes captured will be ( samplerate * seconds recorded ) / hop size
 
@@ -46,8 +49,10 @@ def getPitches(src):
 
 	return list(map(aubio.midi2note, pitches))
 
+
 def rms(arr):
 	return sqrt(sum(arr**2) / len(arr))
+
 
 def getMelody(src):
 	samplerate, data = read(src)
@@ -57,31 +62,46 @@ def getMelody(src):
 
 	threshold = 0.1 # volume threshold -- sounds below this are considered background noise and ignored
 
-	for i in range(len(pitches)):
-		if rms(data[(i * hop_s):((i+1) * hop_s)]) < threshold or pitches[i] == "C-1":
+	for i in range(floor(len(pitches) / 10)):
+		if rms(data[(i*hop_s*10):((i+1)*hop_s*10)]) < threshold:
 			melody.append("R")
 		else:
-			melody.append((pitches[i])[:-1])
+			notes = {}
+			for j in range(10):
+				if pitches[i+j] in notes:
+					notes[pitches[i+j]] += 1
+				else:
+					notes[pitches[i+j]] = 1
+
+			common = list(notes.keys())[0]
+
+			for note in notes:
+				if notes[note] > notes[common]:
+					common = note
+
+			if common == "C-1":
+				common = "R"
+			else:
+				common = common[:-1]
+
+			melody.append(common)
 
 	return melody
 
-def main():
-	samplerate = 44100  # Sample rate
-	seconds = 1 # Duration of recording
+
+def recordMelody(seconds):
 	timesteps = int(seconds * samplerate)
 
-	#print("Recording in...")
-	#countdown(1,10)
+	print("Recording in...")
+	countdown(3)
 	record = sd.rec(timesteps, samplerate=samplerate, channels=1)
 	print("Recording for",seconds,"seconds...")
 	countdown(seconds)
 	
 	sd.wait()  # Wait until recording is finished
-
 	write('output.wav', samplerate, record)
 
-	pitches = getMelody('output.wav')
-	print(pitches)
+	return getMelody('output.wav')
 
 if __name__ =="__main__":
 	main()
