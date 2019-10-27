@@ -7,6 +7,7 @@ Last revised: 10/25/2019 by Benned H
 
 import sounddevice as sd
 from scipy.io.wavfile import read, write
+import os
 import aubio
 from time import sleep
 from math import sqrt, floor
@@ -100,7 +101,9 @@ def recordMelody(seconds):
 	sd.wait()  # Wait until recording is finished
 	write('output.wav', samplerate, record)
 
-	return getMelody('output.wav')
+	melody = getMelody('output.wav')
+	os.remove('output.wav')
+	return melody
 
 if __name__ =="__main__":
 	main()

@@ -29,7 +29,7 @@ def transpose(melody, s): # Transposes a melody by s half-steps
 		if melody[i] == -1:
 			transposed.append(-1)
 		else:
-			transposed.append(melody[i] + s % 12)
+			transposed.append((melody[i] + s) % 12)
 
 	return transposed
 
@@ -46,14 +46,34 @@ def scale(melody, f): # Scales a melody by factor f
 
 	return scaled
 
-def match(melody1, melody2): # Returns the similarity between two melodies
-	# maxSimilarity = 0
-	# transpose()
-	# for (possible scales):
-	# 	scale(possible scale)
-	#	for (possible positions):
-	#		move(possible position)
-	#		if similarity > maxSimilarity:
-	#			maxSimilarity = similarity
-	return 0
+def match(melody1, melody2): # Returns the similarity of two melodies of equal length
+	#print(melody1)
+	similarity = 0
+
+	for n in range(len(melody1)): # Compares each note in the melodies
+		if melody1[n] == melody2[n]:
+			similarity += 1
+		else:
+			diff = min(abs(melody1[n] - melody2[n]), min(melody1[n], melody2[n]) + 12 - max(melody1[n], melody2[n])) # Computes smallest distance between notes, returns 0 if > 3 half-steps
+			sqrDiff = 1 / (1+diff**2)
+			#print("Similarity is " + str(sqrDiff))
+			similarity += sqrDiff;
+
+	similarity /= len(melody1)
+	return similarity
+
+
+def compare(melody1, melody2): # Returns the similarity of two melodies of variable length -- second melody must be longer
+	maxSimilarity = 0
+
+	for t in range(11): # Right now, just try every possible transposition
+		t1 = transpose(melody1, t)
+		for s in range(1, 4): # Try scaling up to 4x
+			s1 = scale(t1, s)
+			for p in range(len(melody2) - len(s1)): # p is left side of s1, so at last iteration right sides of melodies will align
+				similarity = match(s1, melody2[p:p+len(s1)]) # Match first melody with excerpt of second melody
+				if similarity > maxSimilarity:
+					maxSimilarity = similarity
+
+	return maxSimilarity
 
