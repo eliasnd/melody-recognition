@@ -44,35 +44,24 @@ def getPitches(src):
 
 	while True:
 	    samples, read = s()
-	    filtered_samples = f(samples)
-	    pitches += [int(round(pitch_o(filtered_samples)[0]))]
+	    #filtered_samples = f(samples)
+	    #pitches += [int(round(pitch_o(filtered_samples)[0]))]
+	    pitches.append(int(round(pitch_o(samples)[0])))
 	    if read < hop_s: break
 
+	for i in range(len(pitches)):
+		if pitches[i] > 126:
+			pitches[i] = 0
 	return list(map(aubio.midi2note, pitches))
 
 
 def rms(arr):
 	return sqrt(sum(arr**2) / len(arr))
 
-def parseBuckets(arr):
-	# arr: a list of hop pitch estimates.
-
-	bucketSize = 3
-	buckets = []
-
-	for i in range(0,len(arr),bucketSize):
-		try:
-			value = stat.mode(arr[i:i+bucketSize]) # Bucket's guess
-			buckets.append(value)
-		except stat.StatisticsError:
-			buckets.append(arr[i])
-
-	return buckets
-
 def getMelody(src):
 	samplerate, data = read(src)
 	pitches = getPitches(src)
-	print("Piches", pitches)
+	print("Pitches", pitches)
 	hop_s = 1 << int((len(data) / len(pitches))).bit_length()
 	melody = []
 
@@ -80,16 +69,33 @@ def getMelody(src):
 	# Loud background - 0.1
 	threshold = 0.00
 
-	for i in range(len(pitches)):
-		if rms(data[i:i+1]) < threshold:
-			melody.append("R")
-		if pitches[i] == "C-1":
-			melody.append("R")
-		else:
-			melody.append(pitches[i][:-1])
+	# Now parse into buckets
+	bucketSize = 10
+	buckets = []
 
-	# Now, melody has thresholded pitches.
-	buckets = parseBuckets(melody)
+	# First clean octaves and detected rests.
+	for i in range(len(pitches)):
+		if pitches[i] == "C-1":
+			pitches[i] = "R"
+		else:
+			pitches[i] = pitches[i][:-1]
+
+	print("Cleaner pitches", pitches)
+	
+	# Then threshold quiet rests, bucket results.
+	for i in range(0,len(pitches),bucketSize):
+		print("Curr bucket:",pitches[i:i+bucketSize])
+		if rms(data[i:i+bucketSize]) < threshold:
+			buckets.append("R")
+		else:
+			print("Not too quiet")
+			try:
+				value = stat.mode(pitches[i:i+bucketSize]) # Bucket's guess
+				buckets.append(value)
+			except stat.StatisticsError:
+				buckets.append(pitches[i])
+
+	# Now, melody has thresholded buckets.
 	print("Buckets", buckets)
 
 	return buckets

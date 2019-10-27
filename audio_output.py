@@ -5,7 +5,8 @@
 
 import scipy.signal
 import pygame, pygame.sndarray
-import numpy
+import numpy as np
+from time import sleep
 
 sample_rate = 44100
 def play_for(sample_wave, ms):
@@ -17,12 +18,18 @@ def play_for(sample_wave, ms):
 
 def sine_wave(hz, peak, n_samples=sample_rate):
     length = sample_rate / float(hz)
-    omega = numpy.pi * 2 / length
-    xvalues = numpy.arange(int(length)) * omega
-    onecycle = peak * numpy.sin(xvalues)
-    return numpy.resize(onecycle, (n_samples,)).astype(numpy.int16)
+    omega = np.pi * 2 / length
+    xvalues = np.arange(int(length)) * omega
+    onecycle = peak * np.sin(xvalues)
+    return np.resize(onecycle, (n_samples,)).astype(np.int16)
 
-def playSequence(sequence):
+def playSequence(sequence, duration):
+    # duration is in seconds
+
+    # Calculate length of each note given duration
+    total_ms = duration * 1000
+    ms = int(total_ms / len(sequence))
+
     freqDict = {
     "C": 523.25,
     "C#": 554.37,
@@ -44,4 +51,7 @@ def playSequence(sequence):
         else:
             notes.append(freqDict.get(sequence[i]))
     for note in notes:
-        play_for(sine_wave(note, 4096), 250)
+        if note != 0:
+            play_for(sine_wave(note, 4096), ms)
+        else:
+            sleep(ms/1000)

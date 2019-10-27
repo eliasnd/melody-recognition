@@ -34,9 +34,14 @@ def main():
 	repertoire = [birthday, africa, anthem]
 	#playRepertoire() # Play all three songs.
 
-	melody = recordMelody(3) # Decoded melody; pitches
+	test = 0
+	if test:
+		playSequence(
+			['F', 'F', 'F', 'F', 'F', 'F', 'E', 'D#', 'D#', 'D#', 'D#', 'E', 'C#', 'E', 'E', 'F', 'F', 'E', 'C', 'C', 'C', 'C', 'D#', 'D#', 'D#', 'D#']
+		, 3)
+		return
 
-	print("Here")
+	melody = recordMelody(3) # Decoded melody; pitches
 
 	print("I heard " + str(melody))
 
