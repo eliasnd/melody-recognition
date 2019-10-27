@@ -1,6 +1,6 @@
 from audio_input import recordMelody
 from audio_output import playSequence
-from piano_roll import identify
+from comparison import identify
 
 import pygame, pygame.sndarray
 from time import sleep
@@ -9,8 +9,8 @@ from time import sleep
 birthday = ['C', 'D', 'C', 'F', 'E', 'E', 'C', 'D', 'C', 'G', 'F', 'F', 'C', 'C', 'A', 'F', 'E', 'D', 'A#', 'A', 'F', 'G', 'F', 'F', 'F']
 
 # Africa -- Toto -- Eighth note pulse
-africa = [	'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'G', 'G', 'C', 'C', 'D',
-			'C', 'A', 'C', 'A', 'D', 'D', 'C', 'A', 'C', 'D', 'C', 'A', 'G', 'A', 'D', 'C']
+aha = ['F#', 'F#', 'D', 'B', 'R', 'B', 'R', 'E', 'R', 'E', 'R', 'E', 'G#', 'G#', 'A', 'B', 'A', 'A', 'A', 'E', 'R', 'D', 'R', 'F#', 'R', 'F#',
+	   'R', 'F#', 'E', 'E', 'F#', 'E']
 
 # US National Anthem -- Eighth note pulse
 anthem = ['G', 'E', 'C', 'C', 'E', 'E', 'G', 'G', 'C', 'C', 'C', 'C', 'E', 'D', 'C', 'C', 'E', 'E', 'F#', 'F#', 
@@ -22,7 +22,7 @@ def playRepertoire():
 	playSequence(birthday)
 	sleep(2)
 	print("Playing Africa...")
-	playSequence(africa)
+	playSequence(aha)
 	sleep(2)
 	print("Playing Anthem...")
 	playSequence(anthem)
@@ -31,24 +31,26 @@ def playRepertoire():
 def main():
 	pygame.mixer.init(44100, -16,1,2048) # Allows us to play melodies.
 
-	repertoire = [birthday, africa, anthem]
+	repertoire = [birthday, aha, anthem]
 	#playRepertoire() # Play all three songs.
 
 	test = 0
 	if test:
 		playSequence(
-			['F', 'F', 'F', 'F', 'F', 'F', 'E', 'D#', 'D#', 'D#', 'D#', 'E', 'C#', 'E', 'E', 'F', 'F', 'E', 'C', 'C', 'C', 'C', 'D#', 'D#', 'D#', 'D#']
+		['C', 'A#', 'F#', 'D#', 'G#', 'G#', 'C', 'C#', 'D#', 'C#', 'C#']
 		, 3)
 		return
 
-	melody = recordMelody(3) # Decoded melody; pitches
+	melody = recordMelody(5) # Decoded melody; pitches
+
+	playSequence(melody, 3)
 
 	print("I heard " + str(melody))
 
-	song, similarity = identify(melody, repertoire)
+	song, similarities = identify(melody, repertoire)
 
 	print(repertoire.index(song))
-	print("Similarity is " + str(similarity))
+	print("Similarities are", similarities)
 
 
 if __name__ =="__main__":

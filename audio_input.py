@@ -12,6 +12,7 @@ import aubio
 from time import sleep
 from math import sqrt, floor
 import statistics as stat
+import numpy as np
 
 samplerate = 44100
 
@@ -61,7 +62,6 @@ def rms(arr):
 def getMelody(src):
 	samplerate, data = read(src)
 	pitches = getPitches(src)
-	print("Pitches", pitches)
 	hop_s = 1 << int((len(data) / len(pitches))).bit_length()
 	melody = []
 
@@ -70,7 +70,7 @@ def getMelody(src):
 	threshold = 0.00
 
 	# Now parse into buckets
-	bucketSize = 10
+	bucketSize = 40
 	buckets = []
 
 	# First clean octaves and detected rests.
@@ -79,16 +79,12 @@ def getMelody(src):
 			pitches[i] = "R"
 		else:
 			pitches[i] = pitches[i][:-1]
-
-	print("Cleaner pitches", pitches)
 	
 	# Then threshold quiet rests, bucket results.
 	for i in range(0,len(pitches),bucketSize):
-		print("Curr bucket:",pitches[i:i+bucketSize])
 		if rms(data[i:i+bucketSize]) < threshold:
 			buckets.append("R")
 		else:
-			print("Not too quiet")
 			try:
 				value = stat.mode(pitches[i:i+bucketSize]) # Bucket's guess
 				buckets.append(value)
@@ -96,7 +92,6 @@ def getMelody(src):
 				buckets.append(pitches[i])
 
 	# Now, melody has thresholded buckets.
-	print("Buckets", buckets)
 
 	return buckets
 
