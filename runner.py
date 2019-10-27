@@ -1,36 +1,23 @@
-import audio_input as a_in
+from audio_input import recordMelody
 from audio_output import playSequence
-import piano_roll as pr
+from piano_roll import identify
+
 import pygame, pygame.sndarray
 from time import sleep
 
-def identify(melody, repertoire):
-	similarities = []
-	encoding = encode(melody)
+# Happy Birthday -- Quarter note pulse
+birthday = ['C', 'D', 'C', 'F', 'E', 'E', 'C', 'D', 'C', 'G', 'F', 'F', 'C', 'C', 'A', 'F', 'E', 'D', 'A#', 'A', 'F', 'G', 'F', 'F', 'F']
 
-	for r in repertoire:
-		similarities.append(compare(encoding, encode(r)))
+# Africa -- Toto -- Eighth note pulse
+africa = [	'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'G', 'G', 'C', 'C', 'D',
+			'C', 'A', 'C', 'A', 'D', 'D', 'C', 'A', 'C', 'D', 'C', 'A', 'G', 'A', 'D', 'C']
 
-	mostSimilar = repertoire[similarities.index(max(similarities))]
-	return mostSimilar, max(similarities)
+# US National Anthem -- Eighth note pulse
+anthem = ['G', 'E', 'C', 'C', 'E', 'E', 'G', 'G', 'C', 'C', 'C', 'C', 'E', 'D', 'C', 'C', 'E', 'E', 'F#', 'F#', 
+		  'G', 'G', 'G', 'G', 'G', 'G', 'E', 'E', 'E', 'D', 'C', 'C', 'B', 'B', 'B', 'B', 'A', 'B', 'C', 'C', 'C', 'C', 
+		  'G', 'G', 'E', 'E', 'C', 'C', 'C', 'C']
 
-def main():
-
-	# Happy Birthday -- Quarter note pulse
-	birthday = ['C', 'D', 'C', 'F', 'E', 'E', 'C', 'D', 'C', 'G', 'F', 'F', 'C', 'C', 'A', 'F', 'E', 'D', 'A#', 'A', 'F', 'G', 'F', 'F', 'F']
-
-	# Africa -- Toto -- Eighth note pulse
-	africa = [	'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'G', 'G', 'C', 'C', 'D',
-				'C', 'A', 'C', 'A', 'D', 'D', 'C', 'A', 'C', 'D', 'C', 'A', 'G', 'A', 'D', 'C']
-
-	# US National Anthem -- Eighth note pulse
-	anthem = ['G', 'E', 'C', 'C', 'E', 'E', 'G', 'G', 'C', 'C', 'C', 'C', 'E', 'D', 'C', 'C', 'E', 'E', 'F#', 'F#', 
-			  'G', 'G', 'G', 'G', 'G', 'G', 'E', 'E', 'E', 'D', 'C', 'C', 'B', 'B', 'B', 'B', 'A', 'B', 'C', 'C', 'C', 'C', 
-			  'G', 'G', 'E', 'E', 'C', 'C', 'C', 'C']
-
-	# Allows us to play melodies.
-	pygame.mixer.init(44100, -16,1,2048)
-	# Play all three songs.
+def playRepertoire():
 	print("Playing Happy Birthday...")
 	playSequence(birthday)
 	sleep(2)
@@ -38,13 +25,18 @@ def main():
 	playSequence(africa)
 	sleep(2)
 	print("Playing Anthem...")
-	sleep(2)
 	playSequence(anthem)
+	sleep(2)
 
-	#Repertoire
+def main():
+	pygame.mixer.init(44100, -16,1,2048) # Allows us to play melodies.
+
 	repertoire = [birthday, africa, anthem]
+	#playRepertoire() # Play all three songs.
 
 	test = recordMelody(3)
+
+	print("Here")
 
 	print("I heard " + str(test))
 

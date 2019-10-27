@@ -104,6 +104,3 @@ def recordMelody(seconds):
 	melody = getMelody('output.wav')
 	os.remove('output.wav')
 	return melody
-
-if __name__ =="__main__":
-	main()

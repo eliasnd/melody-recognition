@@ -75,3 +75,12 @@ def compare(melody1, melody2): # Returns the similarity of two melodies of varia
 
 	return maxSimilarity
 
+def identify(melody, repertoire):
+	similarities = []
+	encoding = encode(melody)
+
+	for r in repertoire:
+		similarities.append(compare(encoding, encode(r)))
+
+	mostSimilar = repertoire[similarities.index(max(similarities))]
+	return mostSimilar, max(similarities)
