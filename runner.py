@@ -34,13 +34,13 @@ def main():
 	repertoire = [birthday, africa, anthem]
 	#playRepertoire() # Play all three songs.
 
-	test = recordMelody(3)
+	melody = recordMelody(3) # Decoded melody; pitches
 
 	print("Here")
 
-	print("I heard " + str(test))
+	print("I heard " + str(melody))
 
-	song, similarity = identify(test, repertoire)
+	song, similarity = identify(melody, repertoire)
 
 	print(repertoire.index(song))
 	print("Similarity is " + str(similarity))

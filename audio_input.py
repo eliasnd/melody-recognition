@@ -11,6 +11,7 @@ import os
 import aubio
 from time import sleep
 from math import sqrt, floor
+import statistics as stat
 
 samplerate = 44100
 
@@ -53,41 +54,45 @@ def getPitches(src):
 def rms(arr):
 	return sqrt(sum(arr**2) / len(arr))
 
+def parseBuckets(arr):
+	# arr: a list of hop pitch estimates.
+
+	bucketSize = 3
+	buckets = []
+
+	for i in range(0,len(arr),bucketSize):
+		try:
+			value = stat.mode(arr[i:i+bucketSize]) # Bucket's guess
+			buckets.append(value)
+		except stat.StatisticsError:
+			buckets.append(arr[i])
+
+	return buckets
 
 def getMelody(src):
 	samplerate, data = read(src)
 	pitches = getPitches(src)
+	print("Piches", pitches)
 	hop_s = 1 << int((len(data) / len(pitches))).bit_length()
 	melody = []
 
-	threshold = 0.1 # volume threshold -- sounds below this are considered background noise and ignored
+	# volume threshold -- sounds below this are considered background noise and ignored
+	# Loud background - 0.1
+	threshold = 0.00
 
-	for i in range(floor(len(pitches) / 10)):
-		if rms(data[(i*hop_s*10):((i+1)*hop_s*10)]) < threshold:
+	for i in range(len(pitches)):
+		if rms(data[i:i+1]) < threshold:
+			melody.append("R")
+		if pitches[i] == "C-1":
 			melody.append("R")
 		else:
-			notes = {}
-			for j in range(10):
-				if pitches[i+j] in notes:
-					notes[pitches[i+j]] += 1
-				else:
-					notes[pitches[i+j]] = 1
+			melody.append(pitches[i][:-1])
 
-			common = list(notes.keys())[0]
+	# Now, melody has thresholded pitches.
+	buckets = parseBuckets(melody)
+	print("Buckets", buckets)
 
-			for note in notes:
-				if notes[note] > notes[common]:
-					common = note
-
-			if common == "C-1":
-				common = "R"
-			else:
-				common = common[:-1]
-
-			melody.append(common)
-
-	return melody
-
+	return buckets
 
 def recordMelody(seconds):
 	timesteps = int(seconds * samplerate)
