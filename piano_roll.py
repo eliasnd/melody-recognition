@@ -15,10 +15,12 @@ def decode(melody): # Decodes an array formatted as [0, 1, 2, ...] into a melody
 	decoding = []
 
 	for i in range(len(melody)):
-		if melody[i] == -1:
+		note = melody[i]
+		if note == -1:
 			decoding.append("R")
 		else:
-			decoding.append(notes[i])
+			print(note)
+			decoding.append(notes[note])
 
 	return decoding
 
@@ -33,8 +35,13 @@ def transpose(melody, s): # Transposes a melody by s half-steps
 
 	return transposed
 
-def pickScale(melody1, melody2):
-	# Code here
+def pickScale(melody1):
+	# Returns possible transpositions (0, -1 , 4, etc.)
+	# which make 0 the tonic of the given melody.
+	noteCounter = [0]*12
+	print(noteCounter)
+
+
 	return
 
 def scale(melody, f): # Scales a melody by factor f
@@ -56,4 +63,3 @@ def match(melody1, melody2): # Returns the similarity between two melodies
 	#		if similarity > maxSimilarity:
 	#			maxSimilarity = similarity
 	return 0
-
