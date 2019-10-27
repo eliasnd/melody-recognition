@@ -1,5 +1,8 @@
-from audio_input import recordMelody
-from piano_roll import *
+import audio_input as a_in
+from audio_output import playSequence
+import piano_roll as pr
+import pygame, pygame.sndarray
+from time import sleep
 
 def identify(melody, repertoire):
 	similarities = []
@@ -24,6 +27,19 @@ def main():
 	anthem = ['G', 'E', 'C', 'C', 'E', 'E', 'G', 'G', 'C', 'C', 'C', 'C', 'E', 'D', 'C', 'C', 'E', 'E', 'F#', 'F#', 
 			  'G', 'G', 'G', 'G', 'G', 'G', 'E', 'E', 'E', 'D', 'C', 'C', 'B', 'B', 'B', 'B', 'A', 'B', 'C', 'C', 'C', 'C', 
 			  'G', 'G', 'E', 'E', 'C', 'C', 'C', 'C']
+
+	# Allows us to play melodies.
+	pygame.mixer.init(44100, -16,1,2048)
+	# Play all three songs.
+	print("Playing Happy Birthday...")
+	playSequence(birthday)
+	sleep(2)
+	print("Playing Africa...")
+	playSequence(africa)
+	sleep(2)
+	print("Playing Anthem...")
+	sleep(2)
+	playSequence(anthem)
 
 	#Repertoire
 	repertoire = [birthday, africa, anthem]
