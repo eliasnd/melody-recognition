@@ -28,7 +28,9 @@ def main():
 	#Repertoire
 	repertoire = [birthday, africa, anthem]
 
-	test = ['G', 'E', 'C', 'C', 'E', 'F', 'G#', 'G#', 'D#', 'C', 'C', 'C']
+	test = recordMelody(3)
+
+	print("I heard " + str(test))
 
 	song, similarity = identify(test, repertoire)
 

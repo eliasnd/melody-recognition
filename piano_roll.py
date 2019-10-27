@@ -18,7 +18,7 @@ def decode(melody): # Decodes an array formatted as [0, 1, 2, ...] into a melody
 		if melody[i] == -1:
 			decoding.append("R")
 		else:
-			decoding.append(notes[i])
+			decoding.append(notes[melody[i]])
 
 	return decoding
 
@@ -47,16 +47,14 @@ def scale(melody, f): # Scales a melody by factor f
 	return scaled
 
 def match(melody1, melody2): # Returns the similarity of two melodies of equal length
-	#print(melody1)
 	similarity = 0
 
 	for n in range(len(melody1)): # Compares each note in the melodies
 		if melody1[n] == melody2[n]:
 			similarity += 1
-		else:
+		elif melody1[n] != -1:
 			diff = min(abs(melody1[n] - melody2[n]), min(melody1[n], melody2[n]) + 12 - max(melody1[n], melody2[n])) # Computes smallest distance between notes, returns 0 if > 3 half-steps
 			sqrDiff = 1 / (1+diff**2)
-			#print("Similarity is " + str(sqrDiff))
 			similarity += sqrDiff;
 
 	similarity /= len(melody1)
