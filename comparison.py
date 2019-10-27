@@ -57,11 +57,13 @@ def match(melody1, melody2): # Returns the similarity of two melodies of equal l
 			sqrDiff = 1 / (1+diff**2)
 			similarity += sqrDiff;
 
-	similarity /= len(melody1)
+	similarity /= len(melody1) # Normalizes by dividing by length of melody
 	return similarity
 
 
 def compare(melody1, melody2): # Returns the similarity of two melodies of variable length -- second melody must be longer
+	mostSimilar = melody1
+	bestMatch = melody2
 	maxSimilarity = 0
 
 	for t in range(11): # Right now, just try every possible transposition
@@ -72,6 +74,21 @@ def compare(melody1, melody2): # Returns the similarity of two melodies of varia
 				similarity = match(s1, melody2[p:p+len(s1)]) # Match first melody with excerpt of second melody
 				if similarity > maxSimilarity:
 					maxSimilarity = similarity
+					mostSimilar = s1
+					bestMatch = melody2[p:p+len(s1)]
 
+	print("Most similar is")
+	print(decode(mostSimilar))
+	print("Best match is")
+	print(decode(bestMatch))
 	return maxSimilarity
 
+def identify(melody, repertoire):
+	similarities = []
+	encoding = encode(melody)
+
+	for r in repertoire:
+		similarities.append(compare(encoding, encode(r)))
+
+	mostSimilar = repertoire[similarities.index(max(similarities))]
+	return mostSimilar, similarities

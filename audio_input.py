@@ -11,6 +11,8 @@ import os
 import aubio
 from time import sleep
 from math import sqrt, floor
+import statistics as stat
+import numpy as np
 
 samplerate = 44100
 
@@ -43,16 +45,19 @@ def getPitches(src):
 
 	while True:
 	    samples, read = s()
-	    filtered_samples = f(samples)
-	    pitches += [int(round(pitch_o(filtered_samples)[0]))]
+	    #filtered_samples = f(samples)
+	    #pitches += [int(round(pitch_o(filtered_samples)[0]))]
+	    pitches.append(int(round(pitch_o(samples)[0])))
 	    if read < hop_s: break
 
+	for i in range(len(pitches)):
+		if pitches[i] > 126:
+			pitches[i] = 0
 	return list(map(aubio.midi2note, pitches))
 
 
 def rms(arr):
 	return sqrt(sum(arr**2) / len(arr))
-
 
 def getMelody(src):
 	samplerate, data = read(src)
@@ -60,34 +65,35 @@ def getMelody(src):
 	hop_s = 1 << int((len(data) / len(pitches))).bit_length()
 	melody = []
 
-	threshold = 0.1 # volume threshold -- sounds below this are considered background noise and ignored
+	# volume threshold -- sounds below this are considered background noise and ignored
+	# Loud background - 0.1
+	threshold = 0.00
 
-	for i in range(floor(len(pitches) / 10)):
-		if rms(data[(i*hop_s*10):((i+1)*hop_s*10)]) < threshold:
-			melody.append("R")
+	# Now parse into buckets
+	bucketSize = 40
+	buckets = []
+
+	# First clean octaves and detected rests.
+	for i in range(len(pitches)):
+		if pitches[i] == "C-1":
+			pitches[i] = "R"
 		else:
-			notes = {}
-			for j in range(10):
-				if pitches[i+j] in notes:
-					notes[pitches[i+j]] += 1
-				else:
-					notes[pitches[i+j]] = 1
+			pitches[i] = pitches[i][:-1]
+	
+	# Then threshold quiet rests, bucket results.
+	for i in range(0,len(pitches),bucketSize):
+		if rms(data[i:i+bucketSize]) < threshold:
+			buckets.append("R")
+		else:
+			try:
+				value = stat.mode(pitches[i:i+bucketSize]) # Bucket's guess
+				buckets.append(value)
+			except stat.StatisticsError:
+				buckets.append(pitches[i])
 
-			common = list(notes.keys())[0]
+	# Now, melody has thresholded buckets.
 
-			for note in notes:
-				if notes[note] > notes[common]:
-					common = note
-
-			if common == "C-1":
-				common = "R"
-			else:
-				common = common[:-1]
-
-			melody.append(common)
-
-	return melody
-
+	return buckets
 
 def recordMelody(seconds):
 	timesteps = int(seconds * samplerate)
@@ -104,6 +110,3 @@ def recordMelody(seconds):
 	melody = getMelody('output.wav')
 	os.remove('output.wav')
 	return melody
-
-if __name__ =="__main__":
-	main()
