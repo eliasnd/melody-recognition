@@ -8,7 +8,6 @@ Last revised: 10/25/2019 by Benned H
 import sounddevice as sd
 from scipy.io.wavfile import read, write
 import aubio
-import audioop
 from time import sleep
 from math import sqrt, floor
 
