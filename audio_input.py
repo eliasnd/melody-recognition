@@ -48,12 +48,13 @@ def getPitches(src):
 	    #filtered_samples = f(samples)
 	    #pitches += [int(round(pitch_o(filtered_samples)[0]))]
 	    pitches.append(int(round(pitch_o(samples)[0])))
+	    confidences.append(pitch_o.get_confidence())
 	    if read < hop_s: break
 
 	for i in range(len(pitches)):
 		if pitches[i] > 126:
 			pitches[i] = 0
-	return list(map(aubio.midi2note, pitches))
+	return list(map(aubio.midi2note, pitches)), confidences
 
 
 def rms(arr):
@@ -61,7 +62,7 @@ def rms(arr):
 
 def getMelody(src):
 	samplerate, data = read(src)
-	pitches = getPitches(src)
+	pitches, confidences = getPitches(src)
 	hop_s = 1 << int((len(data) / len(pitches))).bit_length()
 	melody = []
 
@@ -93,7 +94,7 @@ def getMelody(src):
 
 	# Now, melody has thresholded buckets.
 
-	return buckets
+	return buckets, confidences
 
 def recordMelody(seconds):
 	timesteps = int(seconds * samplerate)
@@ -107,6 +108,6 @@ def recordMelody(seconds):
 	sd.wait()  # Wait until recording is finished
 	write('output.wav', samplerate, record)
 
-	melody = getMelody('output.wav')
+	melody, confidences = getMelody('output.wav')
 	os.remove('output.wav')
-	return melody
+	return melody, confidences

@@ -46,6 +46,17 @@ def scale(melody, f): # Scales a melody by factor f
 
 	return scaled
 
+def scale(melody, confidences, f):
+	scaledMelody = []
+	scaledConfidences = []
+
+	if f % 1 == 0:
+		for i in range(len(melody)):
+			scaledMelody.extend([melody[i]] * f)
+			scaledConfidences.extend([confidences[i]] * f)
+
+	return scaledMelody, scaledConfidences
+
 def match(melody1, melody2): # Returns the similarity of two melodies of equal length
 	similarity = 0
 
@@ -60,8 +71,7 @@ def match(melody1, melody2): # Returns the similarity of two melodies of equal l
 	similarity /= len(melody1) # Normalizes by dividing by length of melody
 	return similarity
 
-
-def compare(melody1, melody2): # Returns the similarity of two melodies of variable length -- second melody must be longer
+"""def compare(melody1, melody2): # Returns the similarity of two melodies of variable length -- second melody must be longer
 	mostSimilar = melody1
 	bestMatch = melody2
 	maxSimilarity = 0
@@ -81,14 +91,62 @@ def compare(melody1, melody2): # Returns the similarity of two melodies of varia
 	print(decode(mostSimilar))
 	print("Best match is")
 	print(decode(bestMatch))
+	return maxSimilarity"""
+
+def compare(melody1, confidences, melody2): # Returns the similarity of two melodies of variable length -- second melody must be longer
+	mostSimilar = melody1
+	bestMatch = melody2
+	maxSimilarity = 0
+
+	confidenceThreshold = 0.8
+
+	for t in range(11): # Right now, just try every possible transposition
+		t1 = transpose(melody1, t)
+		for s in range(1, 4): # Try scaling up to 4x
+			s1, sc = scale(t1, confidences, s)
+			for p in range(len(melody2) - len(s1)): # p is left side of s1, so at last iteration right sides of melodies will align
+				for n in range(len(s1)):
+					similarity = match(s1, melody2[p:p+len(s1)]) # Match first melody with excerpt of second melody
+					if similarity > maxSimilarity:
+						maxSimilarity = similarity
+						mostSimilar = s1
+						bestMatch = melody2[p:p+len(s1)]
+					if sc[n] < confidenceThreshold:
+						s1[n] = (s1[n] + 1) % 12
+						similarity = match(s1, melody2[p:p+len(s1)]) # Match first melody with excerpt of second melody
+						if similarity > maxSimilarity:
+							maxSimilarity = similarity
+							mostSimilar = s1
+							bestMatch = melody2[p:p+len(s1)]
+						s1[n] = (s1[n] - 2) % 12
+						similarity = match(s1, melody2[p:p+len(s1)]) # Match first melody with excerpt of second melody
+						if similarity > maxSimilarity:
+							maxSimilarity = similarity
+							mostSimilar = s1
+							bestMatch = melody2[p:p+len(s1)]
+
+	print("Most similar is")
+	print(decode(mostSimilar))
+	print("Best match is")
+	print(decode(bestMatch))
 	return maxSimilarity
 
-def identify(melody, repertoire):
+"""def identify(melody, repertoire):
 	similarities = []
 	encoding = encode(melody)
 
 	for r in repertoire:
 		similarities.append(compare(encoding, encode(r)))
+
+	mostSimilar = repertoire[similarities.index(max(similarities))]
+	return mostSimilar, similarities"""
+
+def identify(melody, confidences, repertoire):
+	similarities = []
+	encoding = encode(melody)
+
+	for r in repertoire:
+		similarities.append(compare(encoding, confidences, encode(r)))
 
 	mostSimilar = repertoire[similarities.index(max(similarities))]
 	return mostSimilar, similarities

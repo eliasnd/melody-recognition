@@ -41,13 +41,13 @@ def main():
 		, 3)
 		return
 
-	melody = recordMelody(5) # Decoded melody; pitches
+	melody, confidences = recordMelody(5) # Decoded melody; pitches
 
 	playSequence(melody, 3)
 
 	print("I heard " + str(melody))
 
-	song, similarities = identify(melody, repertoire)
+	song, similarities = identify(melody, confidences, repertoire)
 
 	print(repertoire.index(song))
 	print("Similarities are", similarities)
