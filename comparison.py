@@ -77,10 +77,11 @@ def compare(melody1, melody2): # Returns the similarity of two melodies of varia
 					mostSimilar = s1
 					bestMatch = melody2[p:p+len(s1)]
 
-	print("Most similar is")
+	print("Most similar out of all permutations:")
 	print(decode(mostSimilar))
-	print("Best match is")
+	print("Best match from test melody:")
 	print(decode(bestMatch))
+	print()
 	return maxSimilarity
 
 def identify(melody, repertoire):

@@ -37,13 +37,13 @@ def main():
 	test = 0
 	if test:
 		playSequence(
-		['C', 'A#', 'F#', 'D#', 'G#', 'G#', 'C', 'C#', 'D#', 'C#', 'C#']
+		['F', 'C#', 'D', 'D#', 'D#', 'D', 'F#', 'F#', 'F', 'F', 'R']
 		, 3)
 		return
 
 	melody = recordMelody(5) # Decoded melody; pitches
 
-	playSequence(melody, 3)
+	playSequence(melody, 5)
 
 	print("I heard " + str(melody))
 
@@ -51,7 +51,6 @@ def main():
 
 	print(repertoire.index(song))
 	print("Similarities are", similarities)
-
 
 if __name__ =="__main__":
 	main()
